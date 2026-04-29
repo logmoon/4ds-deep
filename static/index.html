@@ -1,421 +1,1247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SmartShop AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg:        #f7f6f3;
+      --white:     #ffffff;
+      --surface:   #f0efe9;
+      --border:    #e4e2db;
+      --border2:   #ccc9be;
+      --ink:       #1a1917;
+      --ink2:      #3d3b36;
+      --muted:     #888680;
+      --accent:    #2563eb;
+      --accent-bg: #eff4ff;
+      --danger:    #dc2626;
+      --danger-bg: #fef2f2;
+      --success:   #16a34a;
+      --success-bg:#f0fdf4;
+      --warn:      #d97706;
+      --warn-bg:   #fffbeb;
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 400;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    header {
-      background: linear-gradient(135deg, #1e293b 0%, #0f1117 100%);
-      border-bottom: 1px solid #1e293b;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(247,246,243,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 2.5rem; height: 58px; gap: 2rem;
     }
-    header h1 { font-size: 1.4rem; font-weight: 700; color: #f8fafc; }
-    header span { font-size: 0.8rem; color: #64748b; }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 600;
+      color: var(--ink); cursor: pointer;
+      display: flex; align-items: center; gap: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+    .nav-logo .ai-badge {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      background: var(--accent); color: #fff;
+      padding: 0.18rem 0.45rem; border-radius: 3px;
+    }
+    .nav-links { display: flex; gap: 0.25rem; margin-left: auto; }
+    .nav-link {
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--muted); cursor: pointer;
+      background: none; border: none;
+      padding: 0.4rem 0.85rem; border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-link:hover { color: var(--ink); background: var(--surface); }
+    .nav-link.active { color: var(--accent); background: var(--accent-bg); }
 
-    .layout {
+    /* ── Pages ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Catalog ── */
+    .catalog-header {
+      padding: 3.5rem 2.5rem 2rem;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .catalog-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem; font-weight: 400; line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .catalog-header h1 em { font-style: italic; color: var(--accent); }
+    .catalog-header p {
+      font-size: 0.8rem; color: var(--muted);
+      font-weight: 400; letter-spacing: 0.04em;
+    }
+
+    .catalog-grid {
       display: grid;
-      grid-template-columns: 280px 1fr;
-      height: calc(100vh - 61px);
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      padding: 2rem 2.5rem;
+      background: var(--bg);
     }
 
-    /* ── Sidebar ── */
-    aside {
-      background: #0f1117;
-      border-right: 1px solid #1e293b;
-      padding: 1.5rem 1rem;
-      overflow-y: auto;
-    }
-    aside h2 { font-size: 0.7rem; letter-spacing: 0.1em; color: #475569; text-transform: uppercase; margin-bottom: 0.75rem; padding-left: 0.5rem; }
-
-    .product-card {
-      border-radius: 10px;
-      background: #1e293b;
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color 0.15s;
-    }
-    .product-card:hover { border-color: #3b82f6; }
-    .product-card.active { border-color: #3b82f6; background: #1d3a5e; }
-    .product-card h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; }
-    .product-card .price { font-size: 0.75rem; color: #94a3b8; }
-
-    /* ── Main ── */
-    main {
+    .product-tile {
+      background: var(--white);
       padding: 2rem;
-      overflow-y: auto;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .product-tile:hover { 
+      background: var(--surface);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
-    .modules {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    .tile-num {
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--border2); margin-bottom: 1.5rem;
+    }
+    .tile-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .tile-cat {
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); background: var(--accent-bg);
+      padding: 0.2rem 0.5rem; border-radius: 3px;
+      margin-bottom: 0.75rem;
+    }
+    .tile-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 400;
+      line-height: 1.35; margin-bottom: 1.5rem;
+      color: var(--ink);
+    }
+    .tile-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tile-price {
+      font-size: 1.05rem; font-weight: 600; color: var(--ink);
+    }
+    .tile-arrow {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1.5px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; color: var(--muted);
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .product-tile:hover .tile-arrow {
+      border-color: var(--accent); color: var(--accent);
+      background: var(--accent-bg);
+    }
+
+    /* ── Product Detail ── */
+    .detail-wrap { max-width: 1080px; margin: 0 auto; padding: 2rem 2.5rem 5rem; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.8rem; font-weight: 500;
+      color: var(--muted); background: none; border: none;
+      cursor: pointer; padding: 0; margin-bottom: 2rem;
+      transition: color 0.15s;
+    }
+    .back-btn:hover { color: var(--ink); }
+
+    .detail-header {
+      display: grid; grid-template-columns: 1fr 1.2fr;
+      gap: 3.5rem; margin-bottom: 3rem;
+      padding-bottom: 2.5rem; border-bottom: 1px solid var(--border);
+    }
+
+    .detail-img-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+    }
+
+    .detail-meta { display: flex; flex-direction: column; justify-content: center; gap: 0.85rem; }
+    .detail-cat {
+      display: inline-flex; align-self: flex-start;
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); background: var(--accent-bg);
+      padding: 0.25rem 0.6rem; border-radius: 3px;
+    }
+    .detail-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 400; line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .detail-price { font-size: 1.5rem; font-weight: 600; }
+    .detail-id { font-size: 0.75rem; color: var(--muted); }
+
+    .modules-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
       gap: 1rem;
     }
 
-    .module {
-      background: #1e293b;
-      border-radius: 12px;
-      padding: 1.25rem;
-      border: 1px solid #2d3f56;
+    .module-block {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
     }
-    .module-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .module-header .icon { font-size: 1.2rem; }
-    .module-header h3 { font-size: 0.95rem; font-weight: 600; }
-    .module-header .badge {
-      margin-left: auto;
-      font-size: 0.65rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 99px;
-      background: #0f172a;
-      color: #64748b;
-      border: 1px solid #334155;
-    }
-    .module-header .badge.live { background: #052e16; color: #4ade80; border-color: #166534; }
+    .module-block.full { grid-column: 1 / -1; }
 
-    .btn {
-      display: inline-block;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
+    .module-tag {
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.4rem;
+    }
+    .module-title {
+      font-size: 0.95rem; font-weight: 600;
+      color: var(--ink); margin-bottom: 1.1rem;
+    }
+
+    .ai-btn {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.02em;
+      background: var(--ink); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 0.5rem 1.1rem;
       cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 600;
-      width: 100%;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .ai-btn:hover { background: var(--ink2); }
+    .ai-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .ai-btn.secondary {
+      background: var(--surface);
+      color: var(--ink); border: 1px solid var(--border);
+    }
+    .ai-btn.secondary:hover { background: var(--border); }
+
+    .result-box {
+      margin-top: 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      font-size: 0.82rem; color: var(--muted);
+      min-height: 2.8rem; line-height: 1.7;
+    }
+
+    /* Sentiment */
+    .sentiment-track {
+      height: 4px; background: var(--border);
+      border-radius: 4px; overflow: hidden;
+      margin: 0.85rem 0 0.4rem;
+    }
+    .sentiment-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--danger), var(--warn), var(--success));
+      border-radius: 4px;
+      transition: width 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .sentiment-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.65rem; }
+    .s-pill {
+      font-size: 0.72rem; font-weight: 500;
+      padding: 0.25rem 0.65rem; border-radius: 20px;
+      max-width: 200px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .s-pill.positive { background: var(--success-bg); color: var(--success); }
+    .s-pill.negative { background: var(--danger-bg);  color: var(--danger); }
+    .s-pill.neutral  { background: var(--warn-bg);    color: var(--warn); }
+
+    /* Review Cards */
+    .review-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.65rem;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--ink2);
+      position: relative;
+    }
+    .review-card:last-child { margin-bottom: 0; }
+    .review-card .review-icon {
+      position: absolute;
+      top: 0.85rem;
+      right: 1rem;
+      font-size: 1.1rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .review-card.analyzed .review-icon { opacity: 1; }
+    .no-reviews {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* Recommendations */
+    .reco-list { list-style: none; margin-top: 0.75rem; }
+    .reco-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+      font-size: 0.83rem;
+      cursor: pointer;
       transition: background 0.15s;
     }
-    .btn:hover { background: #2563eb; }
-    .btn:disabled { background: #1e3a5f; color: #475569; cursor: not-allowed; }
-
-    .result {
-      margin-top: 0.75rem;
-      background: #0f1117;
-      border-radius: 8px;
-      padding: 0.75rem;
-      font-size: 0.8rem;
-      color: #94a3b8;
-      min-height: 2.5rem;
-      font-family: 'Courier New', monospace;
-      white-space: pre-wrap;
-      word-break: break-word;
+    .reco-item:last-child { border-bottom: none; }
+    .reco-item:hover { background: var(--bg); margin: 0 -0.5rem; padding-left: 0.5rem; padding-right: 0.5rem; border-radius: 6px; }
+    .reco-name { font-weight: 500; color: var(--ink); }
+    .reco-item:hover .reco-name { color: var(--accent); }
+    .reco-score {
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--accent); background: var(--accent-bg);
+      padding: 0.15rem 0.5rem; border-radius: 10px;
+      white-space: nowrap;
+    }
+    .reco-price {
+      font-size: 0.75rem; color: var(--muted);
+      margin-left: 0.5rem;
     }
 
-    .sentiment-bar {
-      height: 6px;
-      border-radius: 3px;
-      background: #0f1117;
-      margin-top: 0.5rem;
-      overflow: hidden;
+    /* Chatbot */
+    .chat-window {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; height: 230px; overflow-y: auto;
+      padding: 1rem; margin: 0.75rem 0;
+      scroll-behavior: smooth;
     }
-    .sentiment-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: linear-gradient(90deg, #ef4444, #eab308, #22c55e);
-      transition: width 0.4s ease;
+    .chat-bubble { margin-bottom: 0.85rem; font-size: 0.83rem; line-height: 1.6; }
+    .chat-bubble .bubble-label {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 0.2rem;
+    }
+    .chat-bubble.user .bubble-label { color: var(--muted); }
+    .chat-bubble.user .bubble-body {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 8px 8px 2px 8px; padding: 0.5rem 0.75rem;
+      display: inline-block; max-width: 90%;
+    }
+    .chat-bubble.bot .bubble-label { color: var(--accent); }
+    .chat-bubble.bot .bubble-body {
+      background: var(--accent-bg); border: 1px solid rgba(37,99,235,0.15);
+      border-radius: 2px 8px 8px 8px; padding: 0.5rem 0.75rem;
+      display: inline-block; max-width: 90%;
+    }
+    .chat-row { display: flex; gap: 0.5rem; }
+    .chat-row input {
+      flex: 1; background: var(--white);
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.83rem; padding: 0.55rem 0.9rem;
+      outline: none; transition: border-color 0.15s;
+    }
+    .chat-row input:focus { border-color: var(--accent); }
+    .chat-row input::placeholder { color: var(--muted); }
+
+    /* ── Vendor Panel ── */
+    .vendor-wrap { max-width: 900px; margin: 0 auto; padding: 2.5rem; }
+    .vendor-hero { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .vendor-hero h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem; font-weight: 400; margin-bottom: 0.4rem;
+    }
+    .vendor-hero p { font-size: 0.82rem; color: var(--muted); }
+
+    .drop-zone {
+      border: 2px dashed var(--border2);
+      background: var(--white); border-radius: 10px;
+      padding: 3rem 2rem; text-align: center;
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+      position: relative; margin-bottom: 1.5rem;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent); background: var(--accent-bg);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .drop-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.35; }
+    .drop-label {
+      font-size: 0.95rem; font-weight: 500;
+      color: var(--ink2); margin-bottom: 0.4rem;
+    }
+    .drop-hint { font-size: 0.75rem; color: var(--muted); }
+
+    .preview-row {
+      display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-start;
+    }
+    #vendor-preview {
+      width: 100px; min-width: 100px; aspect-ratio: 1;
+      object-fit: cover; border: 1px solid var(--border);
+      border-radius: 8px; display: none;
     }
 
-    /* ── Chatbot ── */
-    .chat-area {
-      background: #0f1117;
-      border-radius: 8px;
-      padding: 0.75rem;
-      height: 160px;
-      overflow-y: auto;
-      font-size: 0.8rem;
-      margin-bottom: 0.5rem;
+    .vendor-results {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1rem; margin-top: 1.5rem;
     }
-    .chat-msg { margin-bottom: 0.5rem; }
-    .chat-msg.user { color: #93c5fd; }
-    .chat-msg.bot  { color: #86efac; }
-
-    .chat-input-row { display: flex; gap: 0.5rem; }
-    .chat-input-row input {
-      flex: 1;
-      background: #0f1117;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 0.4rem 0.75rem;
-      color: #e2e8f0;
-      font-size: 0.82rem;
-      outline: none;
+    .v-result-block {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.35rem;
     }
-    .chat-input-row button { width: auto; padding: 0.4rem 0.9rem; }
+    .v-result-tag {
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;
+    }
+    .v-result-title {
+      font-size: 0.88rem; font-weight: 600; color: var(--ink);
+      margin-bottom: 0.85rem;
+    }
+    .v-result-content { font-size: 0.82rem; color: var(--ink2); line-height: 1.65; min-height: 2.5rem; }
+    .v-status {
+      display: inline-block; margin-top: 0.6rem;
+      font-size: 0.7rem; font-weight: 600;
+      padding: 0.2rem 0.6rem; border-radius: 4px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .v-status.ok     { background: var(--success-bg); color: var(--success); }
+    .v-status.warn   { background: var(--danger-bg);  color: var(--danger); }
+    .v-status.info   { background: var(--accent-bg);  color: var(--accent); }
 
-    .label-positive { color: #4ade80; font-weight: 700; }
-    .label-negative { color: #f87171; font-weight: 700; }
-    .label-neutral  { color: #facc15; font-weight: 700; }
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block; width: 12px; height: 12px;
+      border: 2px solid var(--border2); border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      vertical-align: middle; margin-right: 0.35rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    #no-product { color: #475569; font-size: 0.9rem; text-align: center; margin-top: 4rem; }
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--ink); color: #fff;
+      font-size: 0.8rem; font-weight: 500;
+      padding: 0.65rem 1.1rem; border-radius: 7px;
+      opacity: 0; transform: translateY(6px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none; z-index: 200;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
   </style>
 </head>
 <body>
 
-<header>
-  <div style="font-size:1.5rem">🛍️</div>
-  <h1>SmartShop AI</h1>
-  <span>E-Commerce Intelligent & Inclusif</span>
-</header>
+<nav>
+  <div class="nav-logo" onclick="route('catalog')">
+    SmartShop <span class="ai-badge">AI</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" id="nav-catalog" onclick="route('catalog')">Catalogue</button>
+    <button class="nav-link" id="nav-vendor" onclick="route('vendor')">Vendor Panel</button>
+  </div>
+</nav>
 
-<div class="layout">
-  <aside>
-    <h2>Catalogue</h2>
-    <div id="product-list"></div>
-  </aside>
-
-  <main>
-    <div id="no-product">← Select a product to test the AI modules</div>
-    <div id="modules-grid" class="modules" style="display:none"></div>
-  </main>
+<!-- CATALOG -->
+<div id="page-catalog" class="page active">
+  <div class="catalog-header">
+    <div>
+      <h1>Curated with <em>Intelligence</em></h1>
+    </div>
+    <p>AI-powered product discovery</p>
+  </div>
+  <div class="catalog-grid" id="catalog-grid"></div>
 </div>
 
-<script>
-  const API = "http://localhost:5000/api";
-  let selectedProduct = null;
-  let products = [];
-  let chatHistory = [];
+<!-- PRODUCT DETAIL -->
+<div id="page-detail" class="page">
+  <div class="detail-wrap">
+    <button class="back-btn" onclick="route('catalog')">← Back to Catalogue</button>
 
-  // ── Load products ──────────────────────────────────────────────────────
-  async function loadProducts() {
-    try {
-      const res = await fetch(`${API}/health`);
-      if (!res.ok) throw new Error("API not reachable");
-    } catch {
-      document.getElementById("no-product").textContent =
-        "⚠️  Cannot reach Flask API. Run: python main.py";
+    <div class="detail-header">
+      <div class="detail-img-box" id="detail-img">—</div>
+      <div class="detail-meta">
+        <div class="detail-cat" id="detail-cat">—</div>
+        <h2 class="detail-name" id="detail-name">—</h2>
+        <div class="detail-price" id="detail-price">—</div>
+        <div class="detail-id" id="detail-id">—</div>
+        <div class="detail-alttext" id="detail-alttext" style="font-size:0.8rem;color:var(--muted);margin-top:0.75rem;font-style:italic;line-height:1.5;">—</div>
+      </div>
+    </div>
+
+    <div class="modules-grid">
+
+      <!-- Customer Reviews -->
+      <div class="module-block full">
+        <div class="module-tag">Customer Reviews</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <div class="module-title">What Customers Say</div>
+          <button class="ai-btn" onclick="runSentiment()" style="font-size:0.75rem;padding:0.4rem 0.9rem;">Analyse Sentiment</button>
+        </div>
+        
+        <!-- Add Review Form -->
+        <div style="margin-bottom:1.5rem;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+          <div style="font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;color:var(--ink2);">Write a Review</div>
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="review-input" placeholder="Share your experience with this product..." 
+                   style="flex:1;padding:0.6rem;border:1px solid var(--border);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;"
+                   onkeydown="if(event.key==='Enter') submitReview()"/>
+            <button class="ai-btn" onclick="submitReview()" style="font-size:0.8rem;padding:0.6rem 1.2rem;">Post Review</button>
+          </div>
+        </div>
+        
+        <div id="reviews-container" style="margin-bottom:1rem;">
+          <!-- Reviews will be inserted here -->
+        </div>
+        
+        <div id="sentiment-results" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+          <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;">Sentiment Analysis</div>
+          <div id="res-sentiment" class="result-box" style="margin-top:0.5rem;">Click "Analyse Sentiment" to see AI analysis.</div>
+          <div class="sentiment-track"><div class="sentiment-fill" id="sentiment-fill" style="width:0%"></div></div>
+          <div class="sentiment-pills" id="sentiment-pills"></div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="module-block">
+        <div class="module-tag">Discovery — Visual Recommendations</div>
+        <div class="module-title">Similar Products</div>
+        <button class="ai-btn" onclick="runRecommendations()">Find Similar</button>
+        <ul class="reco-list" id="reco-list">
+          <li class="reco-item" style="color:var(--muted);font-size:0.8rem;border:none;">No results yet.</li>
+        </ul>
+      </div>
+
+      <!-- Chatbot -->
+      <div class="module-block">
+        <div class="module-tag">Support — Shopping Assistant</div>
+        <div class="module-title">Ask the AI</div>
+        <div class="chat-window" id="chat-window">
+          <div class="chat-bubble bot">
+            <div class="bubble-label">AI Assistant</div>
+            <div class="bubble-body">Hello! How can I help you with this product today?</div>
+          </div>
+        </div>
+        <div class="chat-row">
+          <input type="text" id="chat-input" placeholder="Ask about features, sizing, alternatives…" onkeydown="if(event.key==='Enter') sendChat()"/>
+          <button class="ai-btn" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- VENDOR PANEL -->
+<div id="page-vendor" class="page">
+  <div class="vendor-wrap">
+    <div class="vendor-hero">
+      <h2>Vendor Panel</h2>
+      <p>Upload a product image — AI analyses it instantly and helps you publish</p>
+    </div>
+
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept="image/*" onchange="handleFile(this.files[0])"/>
+      <div class="drop-icon">⬆</div>
+      <div class="drop-label">Drop image here, or click to browse</div>
+      <div class="drop-hint">JPG, PNG, WEBP — max 10 MB</div>
+    </div>
+
+    <div class="preview-row">
+      <img id="vendor-preview" alt="Preview"/>
+      <div style="flex:1">
+        <div style="font-size:0.72rem;color:var(--muted);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;">Selected file</div>
+        <div id="file-name" style="font-size:0.92rem;color:var(--ink2);">No file selected</div>
+      </div>
+    </div>
+
+    <button class="ai-btn" id="run-vendor-btn" onclick="runVendorAnalysis()" disabled>Run AI Analysis</button>
+
+    <div class="vendor-results">
+
+      <div class="v-result-block">
+        <div class="v-result-tag">Alt-text Generator</div>
+        <div class="v-result-title">Accessibility Description</div>
+        <div class="v-result-content" id="v-alttext">—</div>
+      </div>
+
+      <div class="v-result-block">
+        <div class="v-result-tag">Category Detection</div>
+        <div class="v-result-title">Product Category</div>
+        <div class="v-result-content" id="v-category">—</div>
+      </div>
+
+      <div class="v-result-block">
+        <div class="v-result-tag">Image Quality Check</div>
+        <div class="v-result-title">Quality Assessment</div>
+        <div class="v-result-content" id="v-defect">—</div>
+      </div>
+
+    </div>
+
+    <!-- Upload Product Section (shown after successful AI analysis) -->
+    <div id="upload-section" style="display:none;margin-top:2rem;padding-top:2rem;border-top:1px solid var(--border);">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:400;margin-bottom:1rem;">Publish Product</h3>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.5rem;">All quality checks passed! Fill in the details below to add this product to your catalog.</p>
+      
+      <div style="display:grid;gap:1rem;max-width:600px;">
+        <div>
+          <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--ink2);margin-bottom:0.4rem;letter-spacing:0.02em;">Product Name *</label>
+          <input type="text" id="upload-name" placeholder="e.g., Wireless Noise-Cancelling Headphones" 
+                 style="width:100%;padding:0.65rem;border:1px solid var(--border);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;"/>
+        </div>
+        
+        <div>
+          <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--ink2);margin-bottom:0.4rem;letter-spacing:0.02em;">Price (€) *</label>
+          <input type="number" id="upload-price" placeholder="99.99" step="0.01" min="0"
+                 style="width:100%;padding:0.65rem;border:1px solid var(--border);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;"/>
+        </div>
+        
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+            <label style="font-size:0.75rem;font-weight:600;color:var(--ink2);letter-spacing:0.02em;">Category (AI-detected)</label>
+            <button class="ai-btn secondary" id="edit-category-btn" onclick="toggleEditCategory()" style="font-size:0.68rem;padding:0.25rem 0.6rem;">✏️ Edit</button>
+          </div>
+          <input type="text" id="upload-category" readonly
+                 style="width:100%;padding:0.65rem;border:1px solid var(--border);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;background:var(--bg);"/>
+        </div>
+        
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+            <label style="font-size:0.75rem;font-weight:600;color:var(--ink2);letter-spacing:0.02em;">Alt-text (AI-generated)</label>
+            <button class="ai-btn secondary" id="edit-alttext-btn" onclick="toggleEditAlttext()" style="font-size:0.68rem;padding:0.25rem 0.6rem;">✏️ Edit</button>
+          </div>
+          <textarea id="upload-alttext" rows="3" readonly
+                    style="width:100%;padding:0.65rem;border:1px solid var(--border);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;resize:vertical;background:var(--bg);"></textarea>
+        </div>
+        
+        <button class="ai-btn" id="upload-btn" onclick="uploadProduct()" style="margin-top:0.5rem;">Upload Product</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'http://localhost:5001/api';
+
+let PRODUCTS = [];
+let currentProduct = null;
+let chatHistory    = [];
+let vendorB64      = null;
+let vendorFileName = null;
+
+// Category to icon mapping
+const CATEGORY_ICONS = {
+  'electronics': '🎧',
+  'furniture': '🪑',
+  'clothing': '🧥',
+  'food': '🍕',
+  'sports': '⚽',
+  'books': '📚',
+  'toys': '🧸',
+  'beauty': '💄',
+  'accessories': '👜',
+  'audio': '🔊',
+  'default': '📦'
+};
+
+// Load products from server
+async function loadProducts() {
+  try {
+    const res = await fetch(`${API}/products`);
+    const data = await res.json();
+    PRODUCTS = data.products.map(p => ({
+      ...p,
+      icon: CATEGORY_ICONS[p.category?.toLowerCase()] || CATEGORY_ICONS.default,
+      price: typeof p.price === 'number' ? p.price.toFixed(2) : p.price
+    }));
+    buildCatalog();
+  } catch (e) {
+    console.error('Failed to load products:', e);
+    toast('Failed to load products. Is the server running?');
+  }
+}
+
+// ── Router ──
+function route(page, productId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+  if (page === 'catalog') {
+    document.getElementById('page-catalog').classList.add('active');
+    document.getElementById('nav-catalog').classList.add('active');
+  } else if (page === 'product') {
+    currentProduct = PRODUCTS.find(p => p.id === productId);
+    chatHistory = [];
+    populateDetail();
+    document.getElementById('page-detail').classList.add('active');
+    document.getElementById('nav-catalog').classList.add('active');
+  } else if (page === 'vendor') {
+    document.getElementById('page-vendor').classList.add('active');
+    document.getElementById('nav-vendor').classList.add('active');
+  }
+  window.scrollTo(0, 0);
+}
+
+// ── Catalog ──
+function buildCatalog() {
+  const grid = document.getElementById('catalog-grid');
+  grid.innerHTML = ''; // Clear existing
+  
+  if (PRODUCTS.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--muted)">No products available. Add products via the Vendor Panel.</div>';
+    return;
+  }
+  
+  PRODUCTS.forEach((p, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'product-tile';
+    tile.innerHTML = `
+      <div class="tile-num">${String(i + 1).padStart(2, '0')}</div>
+      <div class="tile-icon">${p.icon}</div>
+      <div class="tile-cat">${p.category || 'Uncategorized'}</div>
+      <div class="tile-name">${escHtml(p.name)}</div>
+      <div class="tile-footer">
+        <div class="tile-price">€${p.price}</div>
+        <div class="tile-arrow">→</div>
+      </div>`;
+    tile.onclick = () => route('product', p.id);
+    grid.appendChild(tile);
+  });
+}
+
+// ── Detail ──
+function populateDetail() {
+  const p = currentProduct;
+  document.getElementById('detail-img').textContent   = p.icon;
+  document.getElementById('detail-name').textContent  = p.name;
+  document.getElementById('detail-price').textContent = `€${p.price}`;
+  document.getElementById('detail-id').textContent    = `Product ID: ${p.id}`;
+  document.getElementById('detail-cat').textContent   = p.category || 'Uncategorized';
+  
+  // Display alt-text if available
+  const altTextEl = document.getElementById('detail-alttext');
+  if (p.alt_text) {
+    altTextEl.textContent = `"${p.alt_text}"`;
+  } else {
+    altTextEl.textContent = 'No accessibility description available';
+  }
+
+  // Display reviews
+  const reviewsContainer = document.getElementById('reviews-container');
+  if (p.reviews && p.reviews.length > 0) {
+    reviewsContainer.innerHTML = p.reviews.map(review => 
+      `<div class="review-card">${escHtml(review)}</div>`
+    ).join('');
+  } else {
+    reviewsContainer.innerHTML = '<div class="no-reviews">No reviews yet. Be the first to review this product!</div>';
+  }
+
+  // Reset sentiment analysis
+  document.getElementById('sentiment-results').style.display = 'none';
+  document.getElementById('res-sentiment').textContent = 'Click "Analyse Sentiment" to see AI analysis.';
+  document.getElementById('sentiment-fill').style.width = '0%';
+  document.getElementById('sentiment-pills').innerHTML = '';
+  
+  document.getElementById('reco-list').innerHTML =
+    '<li class="reco-item" style="color:var(--muted);font-size:0.8rem;border:none;">No results yet.</li>';
+  document.getElementById('chat-window').innerHTML =
+    `<div class="chat-bubble bot">
+       <div class="bubble-label">AI Assistant</div>
+       <div class="bubble-body">Hello! How can I help you with <strong>${escHtml(p.name)}</strong> today?</div>
+     </div>`;
+}
+
+// ── Sentiment ──
+async function runSentiment() {
+  const el    = document.getElementById('res-sentiment');
+  const fill  = document.getElementById('sentiment-fill');
+  const pills = document.getElementById('sentiment-pills');
+  const resultsSection = document.getElementById('sentiment-results');
+
+  if (!currentProduct.reviews || currentProduct.reviews.length === 0) {
+    el.textContent = 'No reviews available for this product.';
+    resultsSection.style.display = 'block';
+    return;
+  }
+
+  resultsSection.style.display = 'block';
+  el.innerHTML = '<span class="spinner"></span>Analysing reviews…';
+  pills.innerHTML = '';
+
+  try {
+    const res  = await fetch(`${API}/sentiment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        reviews: currentProduct.reviews,
+        product_id: currentProduct.id 
+      }),
+    });
+    const data = await res.json();
+
+    const pct = Math.round(data.score * 100);
+    fill.style.width = pct + '%';
+
+    const labelColors = { positive: '🟢', negative: '🔴', neutral: '🟡' };
+    const labelEmoji = { positive: '😊', negative: '😞', neutral: '😐' };
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.95rem;">
+        <span style="font-size:1.5rem;">${labelEmoji[data.label]}</span>
+        <div>
+          <strong>${data.label.charAt(0).toUpperCase() + data.label.slice(1)}</strong> sentiment
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:0.2rem;">
+            ${data.summary.positive} positive · ${data.summary.neutral} neutral · ${data.summary.negative} negative
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Update review cards with sentiment indicators
+    const reviewCards = document.querySelectorAll('.review-card');
+    data.breakdown.forEach((item, idx) => {
+      if (reviewCards[idx]) {
+        reviewCards[idx].classList.add('analyzed');
+        const icon = document.createElement('span');
+        icon.className = 'review-icon';
+        icon.textContent = labelColors[item.label];
+        icon.title = `${item.label} (${Math.round(item.score * 100)}%)`;
+        reviewCards[idx].appendChild(icon);
+      }
+    });
+
+  } catch (e) {
+    el.textContent = 'Error — is the Flask server running?';
+    toast('API error: ' + e.message);
+  }
+}
+
+// ── Submit Review ──
+async function submitReview() {
+  const input = document.getElementById('review-input');
+  const reviewText = input.value.trim();
+  
+  if (!reviewText) {
+    toast('Please write a review first');
+    return;
+  }
+  
+  if (!currentProduct) {
+    toast('No product selected');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${API}/products/${currentProduct.id}/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ review: reviewText })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      // Add review to current product
+      if (!currentProduct.reviews) {
+        currentProduct.reviews = [];
+      }
+      currentProduct.reviews.push(reviewText);
+      
+      // Clear input
+      input.value = '';
+      
+      // Refresh reviews display
+      const reviewsContainer = document.getElementById('reviews-container');
+      reviewsContainer.innerHTML = currentProduct.reviews.map(review => 
+        `<div class="review-card">${escHtml(review)}</div>`
+      ).join('');
+      
+      // Reset sentiment analysis
+      document.getElementById('sentiment-results').style.display = 'none';
+      document.getElementById('sentiment-fill').style.width = '0%';
+      
+      toast('✓ Review posted successfully!');
+    } else {
+      toast('Failed to post review');
+    }
+  } catch (e) {
+    toast('Error posting review: ' + e.message);
+  }
+}
+
+// ── Recommendations ──
+async function runRecommendations() {
+  const list = document.getElementById('reco-list');
+  list.innerHTML = '<li class="reco-item" style="font-size:0.8rem;border:none;color:var(--muted);cursor:default;"><span class="spinner"></span>Finding visually similar products…</li>';
+
+  try {
+    const res  = await fetch(`${API}/similar/${currentProduct.id}`);
+    const data = await res.json();
+
+    if (!data.similar || !data.similar.length) {
+      list.innerHTML = '<li class="reco-item" style="border:none;font-size:0.8rem;color:var(--muted);cursor:default;">No similar products found.</li>';
       return;
     }
 
-    // For demo: hardcode sample products (in production, expose GET /api/products)
-    products = [
-      { id: "prod_001", name: "Wireless Headphones",   price: "129.99€", reviews: ["Amazing sound quality!", "Battery life is incredible.", "A bit tight but great sound."] },
-      { id: "prod_002", name: "Ergonomic Office Chair", price: "249.00€", reviews: ["My back pain disappeared.", "Assembly was a nightmare.", "Comfortable but armrests feel cheap."] },
-      { id: "prod_003", name: "Slim Fit Denim Jacket",  price:  "59.99€", reviews: ["Great quality for the price!", "Runs small, order a size up.", "Love the fit and colour."] },
-    ];
-
-    const list = document.getElementById("product-list");
-    products.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "product-card";
-      card.innerHTML = `<h3>${p.name}</h3><div class="price">${p.price}</div>`;
-      card.addEventListener("click", () => selectProduct(p, card));
-      list.appendChild(card);
-    });
-  }
-
-  function selectProduct(product, card) {
-    document.querySelectorAll(".product-card").forEach(c => c.classList.remove("active"));
-    card.classList.add("active");
-    selectedProduct = product;
-    chatHistory = [];
-    renderModules();
-  }
-
-  // ── Render module cards ────────────────────────────────────────────────
-  function renderModules() {
-    document.getElementById("no-product").style.display = "none";
-    const grid = document.getElementById("modules-grid");
-    grid.style.display = "grid";
-    grid.innerHTML = `
-      ${moduleCard("alt_text",    "🖼️",  "Alt-text Generator",    "STUB",  altTextCard())}
-      ${moduleCard("sentiment",   "⭐",  "Sentiment Analysis",    "LIVE",  sentimentCard())}
-      ${moduleCard("recommendations","🔍","Visual Recommendations","STUB",  recommendationsCard())}
-      ${moduleCard("categorize",  "🏷️",  "Product Categorization","STUB",  categorizeCard())}
-      ${moduleCard("defect",      "🚨",  "Image Quality Check",   "STUB",  defectCard())}
-    `;
-    // Chatbot is wider — append separately
-    const chatDiv = document.createElement("div");
-    chatDiv.className = "module";
-    chatDiv.style.gridColumn = "1 / -1";
-    chatDiv.innerHTML = chatbotCard();
-    grid.appendChild(chatDiv);
-
-    bindEvents();
-  }
-
-  function moduleCard(id, icon, title, badge, inner) {
-    const badgeClass = badge === "LIVE" ? "badge live" : "badge";
-    return `
-      <div class="module" id="mod-${id}">
-        <div class="module-header">
-          <span class="icon">${icon}</span>
-          <h3>${title}</h3>
-          <span class="${badgeClass}">${badge}</span>
+    list.innerHTML = data.similar.map(s => `
+      <li class="reco-item" onclick="route('product', '${s.id}')" title="Click to view ${escHtml(s.name)}">
+        <div style="flex:1;">
+          <span class="reco-name">${escHtml(s.name)}</span>
+          <span class="reco-price">€${s.price}</span>
         </div>
-        ${inner}
-      </div>`;
+        <span class="reco-score">${(s.score * 100).toFixed(1)}% match</span>
+      </li>`).join('');
+
+  } catch (e) {
+    list.innerHTML = '<li class="reco-item" style="border:none;font-size:0.8rem;color:var(--muted);cursor:default;">Error — check server.</li>';
+    toast('API error: ' + e.message);
+  }
+}
+
+// ── Chatbot ──
+async function sendChat() {
+  const inputEl  = document.getElementById('chat-input');
+  const chatWin  = document.getElementById('chat-window');
+  const msg      = inputEl.value.trim();
+  if (!msg) return;
+  inputEl.value = '';
+
+  chatWin.innerHTML += `
+    <div class="chat-bubble user">
+      <div class="bubble-label">You</div>
+      <div class="bubble-body">${escHtml(msg)}</div>
+    </div>`;
+  chatHistory.push({ role: 'user', content: msg });
+
+  const loading = document.createElement('div');
+  loading.className = 'chat-bubble bot';
+  loading.innerHTML = `<div class="bubble-label">AI Assistant</div><div class="bubble-body"><span class="spinner"></span></div>`;
+  chatWin.appendChild(loading);
+  chatWin.scrollTop = chatWin.scrollHeight;
+
+  try {
+    const res  = await fetch(`${API}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, history: chatHistory, product: currentProduct }),
+    });
+    const data = await res.json();
+    loading.querySelector('.bubble-body').textContent = data.reply;
+    chatHistory.push({ role: 'assistant', content: data.reply });
+  } catch (e) {
+    loading.querySelector('.bubble-body').textContent = 'Error — check server.';
+    toast('API error: ' + e.message);
   }
 
-  // ── Module HTML fragments ──────────────────────────────────────────────
+  chatWin.scrollTop = chatWin.scrollHeight;
+}
 
-  function altTextCard() {
-    return `
-      <button class="btn" onclick="callAltText()">Generate Alt-text</button>
-      <div class="result" id="res-alt_text">—</div>`;
+// ── Vendor ──
+function handleFile(file) {
+  if (!file) return;
+  vendorFileName = file.name;
+  document.getElementById('file-name').textContent = file.name;
+  const preview = document.getElementById('vendor-preview');
+  preview.style.display = 'block';
+  preview.src = URL.createObjectURL(file);
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    vendorB64 = e.target.result.split(',')[1];
+    document.getElementById('run-vendor-btn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+
+  document.getElementById('v-alttext').textContent  = '—';
+  document.getElementById('v-category').textContent = '—';
+  document.getElementById('v-defect').textContent   = '—';
+  
+  // Hide upload section initially
+  document.getElementById('upload-section').style.display = 'none';
+}
+
+async function runVendorAnalysis() {
+  if (!vendorB64) return;
+  const body    = JSON.stringify({ image_b64: vendorB64 });
+  const headers = { 'Content-Type': 'application/json' };
+
+  ['v-alttext', 'v-category', 'v-defect'].forEach(id =>
+    document.getElementById(id).innerHTML = '<span class="spinner"></span>');
+
+  const [altRes, catRes, defRes] = await Promise.allSettled([
+    fetch(`${API}/alt-text`,    { method: 'POST', headers, body }),
+    fetch(`${API}/categorize`,  { method: 'POST', headers, body }),
+    fetch(`${API}/check-image`, { method: 'POST', headers, body }),
+  ]);
+
+  let altText = null;
+  let category = null;
+  let imageOk = false;
+
+  // Alt-text
+  if (altRes.status === 'fulfilled') {
+    const d  = await altRes.value.json();
+    altText = d.alt_text;
+    const el = document.getElementById('v-alttext');
+    el.innerHTML = '';
+    const snippet = document.createElement('p');
+    snippet.style.marginBottom = '0.4rem';
+    snippet.textContent = d.alt_text || '—';
+    el.appendChild(snippet);
+    const code = document.createElement('code');
+    code.style.cssText = 'font-size:0.72rem;color:var(--muted);word-break:break-all;';
+    code.textContent = `alt="${d.alt_text}"`;
+    el.appendChild(code);
+    el.insertAdjacentHTML('beforeend', '<br><span class="v-status info">Generated</span>');
+  } else {
+    document.getElementById('v-alttext').textContent = 'Error';
   }
 
-  function sentimentCard() {
-    return `
-      <button class="btn" onclick="callSentiment()">Analyze Reviews</button>
-      <div class="sentiment-bar"><div class="sentiment-bar-fill" id="sentiment-bar" style="width:0%"></div></div>
-      <div class="result" id="res-sentiment">—</div>`;
-  }
-
-  function recommendationsCard() {
-    return `
-      <button class="btn" onclick="callRecommendations()">Find Similar Products</button>
-      <div class="result" id="res-recommendations">—</div>`;
-  }
-
-  function categorizeCard() {
-    return `
-      <button class="btn" onclick="callCategorize()">Detect Category</button>
-      <div class="result" id="res-categorize">—</div>`;
-  }
-
-  function defectCard() {
-    return `
-      <button class="btn" onclick="callDefect()">Check Image Quality</button>
-      <div class="result" id="res-defect">—</div>`;
-  }
-
-  function chatbotCard() {
-    return `
-      <div class="module-header">
-        <span class="icon">💬</span>
-        <h3>Shopping Assistant Chatbot</h3>
-        <span class="badge">STUB</span>
-      </div>
-      <div class="chat-area" id="chat-area"></div>
-      <div class="chat-input-row">
-        <input type="text" id="chat-input" placeholder="Ask about products..." onkeydown="if(event.key==='Enter') sendChat()" />
-        <button class="btn" onclick="sendChat()">Send</button>
-      </div>`;
-  }
-
-  // ── API calls ──────────────────────────────────────────────────────────
-
-  async function callAltText() {
-    const el = document.getElementById("res-alt_text");
-    el.textContent = "Loading...";
-    try {
-      const res = await fetch(`${API}/alt-text`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image_path: `static/images/${selectedProduct.id}.jpg` }),
-      });
-      const data = await res.json();
-      el.textContent = data.alt_text ?? JSON.stringify(data);
-    } catch (e) { el.textContent = "Error: " + e.message; }
-  }
-
-  async function callSentiment() {
-    const el  = document.getElementById("res-sentiment");
-    const bar = document.getElementById("sentiment-bar");
-    el.textContent = "Loading...";
-    try {
-      const res = await fetch(`${API}/sentiment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reviews: selectedProduct.reviews }),
-      });
-      const data = await res.json();
-      const pct  = Math.round(data.score * 100);
-      bar.style.width = pct + "%";
-      const labelClass = `label-${data.label}`;
-      el.innerHTML = `Score: <span class="${labelClass}">${pct}% — ${data.label.toUpperCase()}</span>\n\n` +
-        data.breakdown.map(b => `• "${b.review}"\n  → ${b.label} (${Math.round(b.score*100)}%)`).join("\n\n");
-    } catch (e) { el.textContent = "Error: " + e.message; }
-  }
-
-  async function callRecommendations() {
-    const el = document.getElementById("res-recommendations");
-    el.textContent = "Loading...";
-    try {
-      const res = await fetch(`${API}/similar/${selectedProduct.id}`);
-      const data = await res.json();
-      el.textContent = data.similar.map(s => `• ${s.name} — similarity: ${s.score}`).join("\n");
-    } catch (e) { el.textContent = "Error: " + e.message; }
-  }
-
-  async function callCategorize() {
-    const el = document.getElementById("res-categorize");
-    el.textContent = "Loading...";
-    try {
-      const res = await fetch(`${API}/categorize`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image_path: `static/images/${selectedProduct.id}.jpg` }),
-      });
-      const data = await res.json();
-      el.textContent = `Category: ${data.category}\nConfidence: ${Math.round(data.confidence * 100)}%`;
-    } catch (e) { el.textContent = "Error: " + e.message; }
-  }
-
-  async function callDefect() {
-    const el = document.getElementById("res-defect");
-    el.textContent = "Loading...";
-    try {
-      const res = await fetch(`${API}/check-image`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image_path: `static/images/${selectedProduct.id}.jpg` }),
-      });
-      const data = await res.json();
-      el.textContent = data.ok
-        ? "✅ Image looks good — ready to publish."
-        : `❌ Issue detected: ${data.reason}`;
-    } catch (e) { el.textContent = "Error: " + e.message; }
-  }
-
-  async function sendChat() {
-    const input = document.getElementById("chat-input");
-    const area  = document.getElementById("chat-area");
-    const msg   = input.value.trim();
-    if (!msg) return;
-    input.value = "";
-
-    area.innerHTML += `<div class="chat-msg user">You: ${msg}</div>`;
-    chatHistory.push({ role: "user", content: msg });
-
-    try {
-      const res = await fetch(`${API}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg, history: chatHistory }),
-      });
-      const data = await res.json();
-      area.innerHTML += `<div class="chat-msg bot">Assistant: ${data.reply}</div>`;
-      chatHistory.push({ role: "assistant", content: data.reply });
-    } catch (e) {
-      area.innerHTML += `<div class="chat-msg bot" style="color:#f87171">Error: ${e.message}</div>`;
+  // Category
+  if (catRes.status === 'fulfilled') {
+    const d  = await catRes.value.json();
+    category = d.category;
+    const el = document.getElementById('v-category');
+    const pct = d.confidence ? Math.round(d.confidence * 100) : '—';
+    el.innerHTML = '';
+    const cat = document.createElement('p');
+    cat.style.cssText = 'font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:0.3rem;';
+    cat.textContent = d.category || '—';
+    el.appendChild(cat);
+    if (d.top_categories && d.top_categories.length > 1) {
+      const sub = document.createElement('p');
+      sub.style.cssText = 'font-size:0.75rem;color:var(--muted);';
+      sub.textContent = d.top_categories.slice(1).map(c => `${c.label} ${Math.round(c.score*100)}%`).join(' · ');
+      el.appendChild(sub);
     }
-    area.scrollTop = area.scrollHeight;
+    el.insertAdjacentHTML('beforeend', `<br><span class="v-status info">${pct}% confidence</span>`);
+  } else {
+    document.getElementById('v-category').textContent = 'Error';
   }
 
-  function bindEvents() {} // placeholder for future event delegation
+  // Defect
+  if (defRes.status === 'fulfilled') {
+    const d  = await defRes.value.json();
+    imageOk = d.ok;
+    const el = document.getElementById('v-defect');
+    el.innerHTML = '';
+    const msg = document.createElement('p');
+    msg.textContent = d.ok ? 'Image quality is acceptable.' : (d.reason || 'Issue detected.');
+    el.appendChild(msg);
+    if (d.issues && d.issues.length > 0) {
+      const det = document.createElement('ul');
+      det.style.cssText = 'font-size:0.75rem;color:var(--muted);margin-top:0.4rem;padding-left:1rem;';
+      d.issues.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        det.appendChild(li);
+      });
+      el.appendChild(det);
+    }
+    el.insertAdjacentHTML('beforeend',
+      d.ok ? '<br><span class="v-status ok">Ready to publish</span>'
+           : '<br><span class="v-status warn">Needs attention</span>');
+  } else {
+    document.getElementById('v-defect').textContent = 'Error';
+  }
 
-  // ── Boot ───────────────────────────────────────────────────────────────
-  loadProducts();
+  // Show upload section if image quality is good
+  const uploadSection = document.getElementById('upload-section');
+  if (imageOk && altText && category) {
+    uploadSection.style.display = 'block';
+    // Pre-fill the form
+    document.getElementById('upload-category').value = category;
+    document.getElementById('upload-alttext').value = altText;
+  } else {
+    uploadSection.style.display = 'none';
+    if (!imageOk) {
+      toast('Image quality check failed. Please upload a better quality image.');
+    }
+  }
+}
+
+async function uploadProduct() {
+  const name = document.getElementById('upload-name').value.trim();
+  const price = document.getElementById('upload-price').value.trim();
+  const category = document.getElementById('upload-category').value.trim();
+  const altText = document.getElementById('upload-alttext').value.trim();
+
+  if (!name || !price) {
+    toast('Please fill in product name and price');
+    return;
+  }
+
+  const uploadBtn = document.getElementById('upload-btn');
+  uploadBtn.disabled = true;
+  uploadBtn.innerHTML = '<span class="spinner"></span>Uploading...';
+
+  try {
+    const res = await fetch(`${API}/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        price: parseFloat(price),
+        image_b64: vendorB64,
+        category: category,
+        alt_text: altText,
+        image_ok: true
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      toast('✓ Product uploaded successfully!');
+      
+      // Reload products
+      await loadProducts();
+      
+      // Reset form
+      document.getElementById('upload-name').value = '';
+      document.getElementById('upload-price').value = '';
+      document.getElementById('upload-category').value = '';
+      document.getElementById('upload-alttext').value = '';
+      document.getElementById('file-name').textContent = 'No file selected';
+      document.getElementById('vendor-preview').style.display = 'none';
+      document.getElementById('upload-section').style.display = 'none';
+      document.getElementById('run-vendor-btn').disabled = true;
+      
+      vendorB64 = null;
+      vendorFileName = null;
+      
+      // Reset AI results
+      document.getElementById('v-alttext').textContent = '—';
+      document.getElementById('v-category').textContent = '—';
+      document.getElementById('v-defect').textContent = '—';
+      
+      // Switch to catalog view
+      setTimeout(() => route('catalog'), 1500);
+    } else {
+      toast('Failed to upload product');
+    }
+  } catch (e) {
+    toast('Error uploading product: ' + e.message);
+  } finally {
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = 'Upload Product';
+  }
+}
+
+// Drop-and-drag
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// Add alt-text generation for product detail page
+async function generateAltText() {
+  const el = document.getElementById('res-alttext');
+  if (!currentProduct) return;
+  
+  el.innerHTML = '<span class="spinner"></span>Generating alt-text...';
+  
+  try {
+    const res = await fetch(`${API}/alt-text`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image_path: currentProduct.image_path })
+    });
+    const data = await res.json();
+    el.textContent = data.alt_text || 'No alt-text generated';
+  } catch (e) {
+    el.textContent = 'Error generating alt-text';
+    toast('API error: ' + e.message);
+  }
+}
+
+// Toggle edit for category field
+function toggleEditCategory() {
+  const input = document.getElementById('upload-category');
+  const btn = document.getElementById('edit-category-btn');
+  
+  if (input.readOnly) {
+    input.readOnly = false;
+    input.style.background = 'var(--white)';
+    input.focus();
+    btn.textContent = '✓ Done';
+    btn.style.background = 'var(--success-bg)';
+    btn.style.color = 'var(--success)';
+  } else {
+    input.readOnly = true;
+    input.style.background = 'var(--bg)';
+    btn.textContent = '✏️ Edit';
+    btn.style.background = '';
+    btn.style.color = '';
+  }
+}
+
+// Toggle edit for alt-text field
+function toggleEditAlttext() {
+  const input = document.getElementById('upload-alttext');
+  const btn = document.getElementById('edit-alttext-btn');
+  
+  if (input.readOnly) {
+    input.readOnly = false;
+    input.style.background = 'var(--white)';
+    input.focus();
+    btn.textContent = '✓ Done';
+    btn.style.background = 'var(--success-bg)';
+    btn.style.color = 'var(--success)';
+  } else {
+    input.readOnly = true;
+    input.style.background = 'var(--bg)';
+    btn.textContent = '✏️ Edit';
+    btn.style.background = '';
+    btn.style.color = '';
+  }
+}
+
+// Initialize app
+loadProducts();
+
 </script>
 </body>
 </html>
