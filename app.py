@@ -4,7 +4,7 @@ main.py — SmartShop AI entry point
 The integration lead owns this file.
 Add a new blueprint here when a module is ready.
 """
-
+from dotenv import load_dotenv
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 from database import get_all_products, add_product, get_product, update_product
@@ -19,6 +19,7 @@ from recommendations.routes import bp as recommendations_bp
 from categorization.routes  import bp as categorization_bp
 from chatbot.routes         import bp as chatbot_bp
 from defect_detection.routes import bp as defect_bp
+load_dotenv()
 
 app = Flask(__name__, static_folder="static")
 CORS(app)  # allow the frontend to call the API
