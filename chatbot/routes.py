@@ -1,9 +1,12 @@
 """
-Objectif 5 — Shopping assistant chatbot  [IMPLEMENTED]
-=======================================================
-Hybrid mode:
-  - Local (dev)   : Ollama — llama3.1  (USE_OLLAMA=true)
-  - Hosted (prod) : Groq API — llama-3.1-8b-instant (USE_OLLAMA=false)
+Objectif 5 — Shopping assistant chatbot  [DEEP LEARNING IMPLEMENTATION]
+========================================================================
+Architecture:
+  - RAG (Retrieval-Augmented Generation) : Sentence-BERT embeddings
+  - GPT-2 base : Text generation (no fine-tuning needed)
+  
+Fallback modes (if DL model not available):
+  - Groq API — llama-3.1-8b-instant
 
 Endpoint contract: POST /api/chat
 """
@@ -19,6 +22,7 @@ from database import get_all_products
 bp = Blueprint("chatbot", __name__)
 
 # ── Config ───────────────────────────────────────────────────────────────────
+USE_DL_MODEL = os.environ.get("USE_DL_MODEL", "true").lower() == "true"
 USE_OLLAMA  = os.environ.get("USE_OLLAMA", "true").lower() == "true"
 
 # Ollama (local)
@@ -141,16 +145,143 @@ def call_groq(system_prompt: str, history: list[dict], message: str) -> str:
         raise RuntimeError(f"Unexpected Groq response: {resp.json()}") from exc
 
 
+# ─── Deep Learning Model ─────────────────────────────────────────────────────
+
+_dl_chatbot = None
+
+def get_dl_chatbot():
+    """Lazy load du modèle DL (chargé une seule fois)"""
+    global _dl_chatbot
+    if _dl_chatbot is None:
+        try:
+            from chatbot.model import get_chatbot_model
+            _dl_chatbot = get_chatbot_model()  # Pas besoin de path pour GPT-2 base
+            print("[chatbot] ✓ Deep Learning model loaded (RAG + GPT-2)")
+        except Exception as e:
+            print(f"[chatbot] ⚠ Failed to load DL model: {e}")
+            print("[chatbot] → Falling back to API mode")
+            return None
+    return _dl_chatbot
+
+
+def call_dl_model(catalogue: list, history: list[dict], message: str) -> str:
+    """
+    Utilise le modèle Deep Learning (RAG + Fine-tuned Flan-T5).
+    
+    Architecture:
+      1. RAG : Sentence-BERT trouve les produits pertinents
+      2. Flan-T5 : Génère la réponse avec contexte
+    """
+    chatbot = get_dl_chatbot()
+    if chatbot is None:
+        raise RuntimeError("DL model not available")
+    
+    # Step 1: RAG - Retrieve relevant products
+    relevant_products = chatbot.retrieve_products(
+        query=message,
+        catalogue=catalogue,
+        top_k=3
+    )
+    
+    print(f"[chatbot] RAG retrieved: {[p['name'] for p in relevant_products]}")
+    
+    # Step 2: Generate response with GPT-2
+    response = chatbot.generate_response(
+        message=message,
+        history=history,
+        context_products=relevant_products,
+        max_length=60,
+        temperature=0.7
+    )
+    
+    return response
+
+
+# ─── Simple Rule-Based Chatbot (Fallback offline) ───────────────────────────
+
+def call_simple_chatbot(catalogue: list, message: str) -> str:
+    """
+    Chatbot simple basé sur des règles (fonctionne offline).
+    Utilisé quand aucun modèle DL ou API n'est disponible.
+    """
+    message_lower = message.lower()
+    
+    # Recherche de mots-clés
+    if any(word in message_lower for word in ["headphone", "audio", "sound", "music", "listen"]):
+        products = [p for p in catalogue if "headphone" in p["name"].lower()]
+        if products:
+            p = products[0]
+            return f"I recommend the {p['name']} at €{p['price']}. It's perfect for audio needs!"
+    
+    elif any(word in message_lower for word in ["chair", "office", "sit", "desk", "back"]):
+        products = [p for p in catalogue if "chair" in p["name"].lower()]
+        if products:
+            p = products[0]
+            return f"Check out the {p['name']} at €{p['price']}. Great for office comfort!"
+    
+    elif any(word in message_lower for word in ["clothing", "jacket", "wear", "fashion"]):
+        products = [p for p in catalogue if "jacket" in p["name"].lower() or p.get("category") == "clothing"]
+        if products:
+            p = products[0]
+            return f"We have the {p['name']} at €{p['price']}. Stylish and affordable!"
+    
+    elif any(word in message_lower for word in ["cheap", "affordable", "budget", "inexpensive"]):
+        if catalogue:
+            cheapest = min(catalogue, key=lambda x: x.get("price", float('inf')))
+            return f"Our most affordable item is the {cheapest['name']} at €{cheapest['price']}!"
+    
+    elif any(word in message_lower for word in ["expensive", "premium", "best", "top"]):
+        if catalogue:
+            most_expensive = max(catalogue, key=lambda x: x.get("price", 0))
+            return f"Our premium item is the {most_expensive['name']} at €{most_expensive['price']}."
+    
+    # Réponse par défaut
+    if catalogue:
+        sample_products = catalogue[:3]
+        products_list = ", ".join([f"{p['name']} (€{p['price']})" for p in sample_products])
+        return f"We have great products available: {products_list}. What are you looking for?"
+    
+    return "Hello! I'm here to help you find products. What are you looking for today?"
+
+
 # ─── Router ──────────────────────────────────────────────────────────────────
 
-def call_llm(system_prompt: str, history: list[dict], message: str) -> str:
-    """Route vers Ollama (local) ou Groq (hébergé) selon USE_OLLAMA."""
+def call_llm(system_prompt: str, history: list[dict], message: str, catalogue: list = None) -> str:
+    """
+    Route vers le modèle approprié:
+      1. Deep Learning (RAG + Flan-T5) si USE_DL_MODEL=true
+      2. Ollama (local) si USE_OLLAMA=true
+      3. Groq (hosted) si disponible
+      4. Simple chatbot (fallback offline)
+    """
+    if USE_DL_MODEL:
+        try:
+            print("[chatbot] mode DEEP LEARNING — RAG + GPT-2")
+            return call_dl_model(catalogue or [], history, message)
+        except Exception as e:
+            print(f"[chatbot] DL model failed: {e}")
+            print("[chatbot] → Falling back to API mode")
+    
     if USE_OLLAMA:
-        print("[chatbot] mode LOCAL — Ollama llama3.1")
-        return call_ollama(system_prompt, history, message)
-    else:
-        print("[chatbot] mode PROD — Groq llama-3.1-8b-instant")
-        return call_groq(system_prompt, history, message)
+        try:
+            print("[chatbot] mode LOCAL — Ollama llama3.1")
+            return call_ollama(system_prompt, history, message)
+        except Exception as e:
+            print(f"[chatbot] Ollama failed: {e}")
+            print("[chatbot] → Falling back to simple chatbot")
+    
+    # Try Groq if available
+    if GROQ_API_KEY:
+        try:
+            print("[chatbot] mode PROD — Groq llama-3.1-8b-instant")
+            return call_groq(system_prompt, history, message)
+        except Exception as e:
+            print(f"[chatbot] Groq failed (no internet?): {e}")
+            print("[chatbot] → Falling back to simple chatbot")
+    
+    # Fallback: Simple rule-based chatbot (works offline)
+    print("[chatbot] mode SIMPLE — Rule-based chatbot (offline)")
+    return call_simple_chatbot(catalogue or [], message)
 
 
 def extract_suggested_products(reply: str) -> list[str]:
@@ -190,7 +321,7 @@ def chat():
     system_prompt = build_system_prompt(catalogue, product)
 
     try:
-        reply = call_llm(system_prompt, history, message)
+        reply = call_llm(system_prompt, history, message, catalogue)
     except RuntimeError as exc:
         print("ERREUR LLM:", str(exc))
         return jsonify({"error": str(exc)}), 503
