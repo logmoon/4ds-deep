@@ -2,26 +2,19 @@ flask==3.0.3
 flask-cors==4.0.1
 
 # Shared ML
-torch==2.3.0
-torchvision==0.18.0
-pillow==10.3.0
-numpy==1.26.4
+torch
+torchvision
+pillow>=11.0.0
+numpy
 
-# Obj 1 — Alt-text (ResNet-50 + Transformer)
-transformers==4.41.2
+# Obj 1 — Alt-text
+transformers
 
-# Obj 2 — Sentiment (BERT via HuggingFace pipeline)
-# transformers already above
+# Obj 3 — Recommendations
+scikit-learn
 
-# Obj 3 — Recommendations (cosine similarity)
-scikit-learn==1.5.0
+# Obj 5 — Chatbot
+google-generativeai
 
-# Obj 4 — Categorization (CLIP)
-# pip install git+https://github.com/openai/CLIP.git
-# or: open_clip_torch==2.24.0
-
-# Obj 5 — Chatbot (Google Gemini)
-google-generativeai==0.7.2
-
-# Obj 6 — Defect detection (OpenCV heuristics)
-opencv-python-headless==4.10.0.82
+# Obj 6 — Defect detection
+opencv-python-headless

@@ -71,5 +71,29 @@
     "name": "Book",
     "price": 399.0,
     "image_path": "static/images/prod_726bd58c.jpg"
-  }
+  },
+  {
+  "id": "prod_006",
+  "name": "Bluetooth Earbuds",
+  "image_path": "static/images/prod_006.jpg",
+  "price": 79.99,
+  "category": "electronics",
+  "alt_text": "Small wireless bluetooth earbuds in a charging case",
+  "sentiment_score": 0.75,
+  "sentiment_label": "positive",
+  "image_ok": true,
+  "reviews": []
+},
+{
+  "id": "prod_007",
+  "name": "Gaming Headset",
+  "image_path": "static/images/prod_007.jpg",
+  "price": 89.99,
+  "category": "electronics",
+  "alt_text": "Black gaming headset with microphone and padded ear cups",
+  "sentiment_score": 0.8,
+  "sentiment_label": "positive",
+  "image_ok": true,
+  "reviews": []
+}
 ]
