@@ -1,11 +1,12 @@
 """
-Objectif 6 — Defective image detection  [STUB]
+Objectif 6 — Defective image detection
 ================================================
-Replace stub with OpenCV heuristics or a trained binary classifier.
+Real OpenCV heuristics replacing the stub.
 Endpoint contract: POST /api/check-image
 """
 
 from flask import Blueprint, request, jsonify
+from .model import analyze_image
 
 bp = Blueprint("defect_detection", __name__)
 
@@ -40,62 +41,15 @@ def check_image():
     }
     """
     data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "Request body is required"}), 400
+
     image_path = data.get("image_path")
-    image_b64 = data.get("image_b64")
+    image_b64  = data.get("image_b64")
 
     if not image_path and not image_b64:
         return jsonify({"error": "image_path or image_b64 is required"}), 400
 
-    # ── TODO: compute Laplacian variance for blur, check brightness, etc. ───
-    # import cv2, numpy as np
-    # img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    # blur_score = cv2.Laplacian(img, cv2.CV_64F).var()
-    # if blur_score < 100: return {"ok": False, "reason": f"Too blurry ({blur_score:.1f})"}
-    
-    # Stub: simulate quality checks with random but realistic values
-    import random
-    if image_path:
-        seed_val = hash(image_path)
-    else:
-        seed_val = hash(image_b64[:100] if image_b64 else "default")
-    
-    random.seed(seed_val)
-    
-    # Generate quality metrics
-    sharpness = round(random.uniform(0.70, 0.98), 2)
-    brightness = round(random.uniform(0.65, 0.95), 2)
-    contrast = round(random.uniform(0.68, 0.96), 2)
-    
-    quality_score = round((sharpness + brightness + contrast) / 3, 2)
-    
-    issues = []
-    if sharpness < 0.75:
-        issues.append("Image appears blurry or out of focus")
-    if brightness < 0.70:
-        issues.append("Image is too dark")
-    elif brightness > 0.92:
-        issues.append("Image is overexposed")
-    if contrast < 0.72:
-        issues.append("Low contrast detected")
-    
-    ok = quality_score >= 0.75 and len(issues) == 0
-    
-    response = {
-        "ok": ok,
-        "quality_score": quality_score,
-        "details": {
-            "sharpness": sharpness,
-            "brightness": brightness,
-            "contrast": contrast
-        }
-    }
-    
-    if not ok:
-        response["issues"] = issues
-        response["reason"] = "Image quality does not meet publication standards"
-    else:
-        response["issues"] = []
-    
-    # ────────────────────────────────────────────────────────────────────────
-
-    return jsonify(response)
+    result = analyze_image(image_path=image_path, image_b64=image_b64)
+    return jsonify(result)

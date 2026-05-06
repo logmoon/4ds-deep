@@ -1051,9 +1051,11 @@ async function runVendorAnalysis() {
     imageOk = d.ok;
     const el = document.getElementById('v-defect');
     el.innerHTML = '';
+
     const msg = document.createElement('p');
     msg.textContent = d.ok ? 'Image quality is acceptable.' : (d.reason || 'Issue detected.');
     el.appendChild(msg);
+
     if (d.issues && d.issues.length > 0) {
       const det = document.createElement('ul');
       det.style.cssText = 'font-size:0.75rem;color:var(--muted);margin-top:0.4rem;padding-left:1rem;';
@@ -1064,9 +1066,58 @@ async function runVendorAnalysis() {
       });
       el.appendChild(det);
     }
+
     el.insertAdjacentHTML('beforeend',
       d.ok ? '<br><span class="v-status ok">Ready to publish</span>'
            : '<br><span class="v-status warn">Needs attention</span>');
+
+    // ── Enhanced image section ──────────────────────────────────────────
+    if (!d.ok && d.enhanced_image) {
+      const enhancedScore = d.enhanced_details?.quality_score ?? 0;
+      const improved = enhancedScore > d.quality_score;
+
+      el.insertAdjacentHTML('beforeend', `
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+          <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.6rem;">
+            🤖 AI Enhanced Version
+          </div>
+          <div style="display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;">
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:0.68rem;color:var(--muted);margin-bottom:0.3rem;">Original</div>
+              <img src="${document.getElementById('vendor-preview').src}"
+                   style="width:100%;border-radius:6px;border:1px solid var(--border);"/>
+              <div style="font-size:0.72rem;margin-top:0.3rem;color:var(--danger);">
+                Score: ${Math.round(d.quality_score * 100)}%
+              </div>
+            </div>
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:0.68rem;color:var(--muted);margin-bottom:0.3rem;">Enhanced</div>
+              <img src="data:image/jpeg;base64,${d.enhanced_image}"
+                   id="enhanced-preview"
+                   style="width:100%;border-radius:6px;border:1px solid var(--border);"/>
+              <div style="font-size:0.72rem;margin-top:0.3rem;color:${d.enhanced_ok ? 'var(--success)' : 'var(--warn)'};">
+                Score: ${Math.round(enhancedScore * 100)}%
+                ${d.enhanced_ok ? '✓' : ''}
+              </div>
+            </div>
+          </div>
+          ${improved ? `
+            <button class="ai-btn secondary" onclick="useEnhancedImage('${d.enhanced_image}')"
+              style="width:100%;font-size:0.78rem;padding:0.5rem;">
+              Use Enhanced Image Instead
+            </button>` : `
+            <p style="font-size:0.75rem;color:var(--muted);text-align:center;">
+              Enhancement applied but image quality is still low. Consider uploading a better photo.
+            </p>`}
+        </div>
+      `);
+
+      // If enhanced passed, allow publishing with it
+      if (d.enhanced_ok) {
+        imageOk = true;
+        vendorB64 = d.enhanced_image;
+      }
+    }
   } else {
     document.getElementById('v-defect').textContent = 'Error';
   }
@@ -1195,6 +1246,15 @@ async function generateAltText() {
     el.textContent = 'Error generating alt-text';
     toast('API error: ' + e.message);
   }
+}
+
+function useEnhancedImage(b64) {
+  // Swap the vendor image for the enhanced version
+  vendorB64 = b64;
+  document.getElementById('vendor-preview').src = 'data:image/jpeg;base64,' + b64;
+  document.getElementById('upload-section').style.display = 'block';
+  document.getElementById('upload-category').value = document.getElementById('upload-category').value;
+  toast('✓ Using enhanced image for upload');
 }
 
 // Toggle edit for category field
