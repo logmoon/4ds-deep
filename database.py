@@ -60,6 +60,9 @@ def add_product(product: dict) -> bool:
         "sentiment_label": None,
         "image_ok": None,
         "reviews": [],
+        "seller": "Anonymous",
+        "seller_id": "",
+        "description": "",
     }
     full = {**defaults, **product}
     products = get_all_products()

@@ -39,7 +39,7 @@ GROQ_MODEL   = "llama-3.1-8b-instant"
 
 def build_system_prompt(catalogue: list | None, product: dict | None) -> str:
     lines = [
-        "You are SmartShop AI, a friendly and knowledgeable shopping assistant.",
+        "You are Selvo AI, a friendly and knowledgeable shopping assistant.",
         "You help customers find products, answer questions, and make purchase decisions.",
         "Always be concise, helpful, and specific. Reply in the same language the user writes in.",
         "If you recommend products, reference them by their exact name from the catalogue.",
@@ -50,11 +50,12 @@ def build_system_prompt(catalogue: list | None, product: dict | None) -> str:
     if product:
         lines += [
             "## Product currently viewed by the customer",
-            f"Name     : {product.get('name', 'N/A')}",
-            f"Price    : €{product.get('price', 'N/A')}",
-            f"Category : {product.get('category') or 'Not yet categorised'}",
-            f"Alt-text : {product.get('alt_text') or 'N/A'}",
-            f"Sentiment: {product.get('sentiment_label') or 'N/A'} "
+            f"Name       : {product.get('name', 'N/A')}",
+            f"Price      : €{product.get('price', 'N/A')}",
+            f"Seller     : {product.get('seller') or 'Anonymous'}",
+            f"Category   : {product.get('category') or 'Not yet categorised'}",
+            f"Description: {product.get('description') or 'N/A'}",
+            f"Sentiment  : {product.get('sentiment_label') or 'N/A'} "
             f"(score {product.get('sentiment_score') or 'N/A'})",
             "",
         ]
@@ -64,7 +65,8 @@ def build_system_prompt(catalogue: list | None, product: dict | None) -> str:
         for p in catalogue:
             lines.append(
                 f"- [{p['id']}] {p['name']} — €{p.get('price', '?')} "
-                f"| category: {p.get('category') or 'unknown'}"
+                f"| category: {p.get('category') or 'unknown'} "
+                f"| seller: {p.get('seller') or 'Anonymous'}"
             )
         lines.append("")
 
