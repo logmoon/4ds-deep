@@ -249,56 +249,129 @@
       min-height: 2.8rem; line-height: 1.7;
     }
 
-    /* Sentiment */
-    .sentiment-track {
-      height: 4px; background: var(--border);
-      border-radius: 4px; overflow: hidden;
-      margin: 0.85rem 0 0.4rem;
+    /* ── Reviews + Summary 2-col split ── */
+    .reviews-absa-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      min-height: 380px;
     }
-    .sentiment-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--danger), var(--warn), var(--success));
-      border-radius: 4px;
-      transition: width 0.7s cubic-bezier(.4,0,.2,1);
+    .reviews-col {
+      padding-right: 1.5rem;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
     }
-    .sentiment-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.65rem; }
-    .s-pill {
-      font-size: 0.72rem; font-weight: 500;
-      padding: 0.25rem 0.65rem; border-radius: 20px;
-      max-width: 200px; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis;
+    .reviews-col-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem;
     }
-    .s-pill.positive { background: var(--success-bg); color: var(--success); }
-    .s-pill.negative { background: var(--danger-bg);  color: var(--danger); }
-    .s-pill.neutral  { background: var(--warn-bg);    color: var(--warn); }
+    .summary-col {
+      padding-left: 1.5rem;
+      display: flex; flex-direction: column;
+    }
 
     /* Review Cards */
     .review-card {
       background: var(--bg);
       border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
       border-radius: 8px;
-      padding: 0.85rem 1rem;
-      margin-bottom: 0.65rem;
-      font-size: 0.85rem;
+      padding: 0.75rem 0.9rem;
+      margin-bottom: 0.55rem;
+      font-size: 0.83rem;
       line-height: 1.6;
       color: var(--ink2);
-      position: relative;
+      transition: border-left-color 0.4s ease;
     }
     .review-card:last-child { margin-bottom: 0; }
-    .review-card .review-icon {
-      position: absolute;
-      top: 0.85rem;
-      right: 1rem;
-      font-size: 1.1rem;
-      opacity: 0;
-      transition: opacity 0.3s;
+    .review-card.sentiment-positive { border-left-color: var(--success); }
+    .review-card.sentiment-negative { border-left-color: var(--danger); }
+    .review-card.sentiment-neutral  { border-left-color: var(--warn); }
+    .review-card-text { margin-bottom: 0; }
+    .review-card-aspects {
+      display: flex; flex-wrap: wrap; gap: 0.3rem;
+      margin-top: 0.5rem; padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
     }
-    .review-card.analyzed .review-icon { opacity: 1; }
+    .review-aspect-tag {
+      font-size: 0.69rem; font-weight: 500;
+      padding: 0.15rem 0.5rem; border-radius: 20px;
+      border: 1px solid;
+    }
+    .review-aspect-tag.positive { border-color: #86efac; background: var(--success-bg); color: var(--success); }
+    .review-aspect-tag.negative { border-color: #fca5a5; background: var(--danger-bg);  color: var(--danger); }
+    .review-aspect-tag.neutral  { border-color: #fcd34d; background: var(--warn-bg);    color: var(--warn); }
     .no-reviews {
-      text-align: center;
-      padding: 2rem;
-      color: var(--muted);
+      text-align: center; padding: 2rem;
+      color: var(--muted); font-size: 0.85rem;
+    }
+
+    /* ── Summary Panel (buyer-facing) ── */
+    .summary-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.85rem; text-align: center; padding: 2rem;
+    }
+    .summary-empty-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .summary-empty p { font-size: 0.82rem; color: var(--muted); line-height: 1.55; max-width: 180px; }
+    .summary-empty strong { color: var(--ink); }
+
+    /* Verdict block */
+    .verdict-block {
+      padding: 1.1rem 1.2rem;
+      border-radius: 10px;
+      margin-bottom: 1.25rem;
+      border: 1px solid;
+    }
+    .verdict-block.positive { background: var(--success-bg); border-color: #86efac; }
+    .verdict-block.negative { background: var(--danger-bg);  border-color: #fca5a5; }
+    .verdict-block.neutral  { background: var(--warn-bg);    border-color: #fcd34d; }
+    .verdict-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; font-weight: 600; line-height: 1.25;
+      margin-bottom: 0.3rem;
+    }
+    .verdict-block.positive .verdict-headline { color: #14532d; }
+    .verdict-block.negative .verdict-headline { color: #7f1d1d; }
+    .verdict-block.neutral  .verdict-headline { color: #78350f; }
+    .verdict-sub { font-size: 0.78rem; opacity: 0.75; }
+
+    /* Topic cards */
+    .topics-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 0.65rem;
+    }
+    .topic-card {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      animation: topicIn 0.3s ease both;
+    }
+    .topic-card:last-child { border-bottom: none; }
+    @keyframes topicIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .topic-icon {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
       font-size: 0.85rem;
+    }
+    .topic-icon.positive { background: var(--success-bg); }
+    .topic-icon.negative { background: var(--danger-bg); }
+    .topic-icon.neutral  { background: var(--warn-bg); }
+    .topic-term {
+      font-size: 0.85rem; font-weight: 600; color: var(--ink);
+      text-transform: capitalize; flex: 1;
+    }
+    .topic-verdict {
+      font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem;
     }
 
     /* Recommendations */
@@ -494,34 +567,60 @@
 
     <div class="modules-grid">
 
-      <!-- Customer Reviews -->
+      <!-- Customer Reviews + Summary -->
       <div class="module-block full">
-        <div class="module-tag">Customer Reviews</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-          <div class="module-title">What Customers Say</div>
-          <button class="ai-btn" onclick="runSentiment()" style="font-size:0.75rem;padding:0.4rem 0.9rem;">Analyse Sentiment</button>
-        </div>
-        
-        <!-- Add Review Form -->
-        <div style="margin-bottom:1.5rem;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
-          <div style="font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;color:var(--ink2);">Write a Review</div>
-          <div style="display:flex;gap:0.5rem;">
-            <input type="text" id="review-input" placeholder="Share your experience with this product..." 
-                   style="flex:1;padding:0.6rem;border:1px solid var(--border);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;"
-                   onkeydown="if(event.key==='Enter') submitReview()"/>
-            <button class="ai-btn" onclick="submitReview()" style="font-size:0.8rem;padding:0.6rem 1.2rem;">Post Review</button>
+        <div class="reviews-absa-split">
+
+          <!-- ── Left: Reviews ── -->
+          <div class="reviews-col">
+            <div class="reviews-col-header">
+              <div>
+                <div class="module-tag">Customer Reviews</div>
+                <div class="module-title" style="margin-bottom:0;">What Customers Say</div>
+              </div>
+              <button class="ai-btn" onclick="runSentiment()" id="analyse-btn" style="font-size:0.75rem;padding:0.4rem 0.9rem;white-space:nowrap;">Summarise Reviews</button>
+            </div>
+
+            <!-- Write a review -->
+            <div style="margin-bottom:1rem;padding:0.85rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+              <div style="font-size:0.72rem;font-weight:600;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.5rem;">Write a Review</div>
+              <div style="display:flex;gap:0.5rem;">
+                <input type="text" id="review-input" placeholder="Share your experience…"
+                       style="flex:1;padding:0.55rem 0.75rem;border:1px solid var(--border);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;background:var(--white);outline:none;"
+                       onkeydown="if(event.key==='Enter') submitReview()"/>
+                <button class="ai-btn secondary" onclick="submitReview()" style="font-size:0.78rem;padding:0.55rem 0.9rem;">Post</button>
+              </div>
+            </div>
+
+            <!-- Review list -->
+            <div id="reviews-container" style="flex:1;overflow-y:auto;max-height:420px;"></div>
           </div>
-        </div>
-        
-        <div id="reviews-container" style="margin-bottom:1rem;">
-          <!-- Reviews will be inserted here -->
-        </div>
-        
-        <div id="sentiment-results" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
-          <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;">Sentiment Analysis</div>
-          <div id="res-sentiment" class="result-box" style="margin-top:0.5rem;">Click "Analyse Sentiment" to see AI analysis.</div>
-          <div class="sentiment-track"><div class="sentiment-fill" id="sentiment-fill" style="width:0%"></div></div>
-          <div class="sentiment-pills" id="sentiment-pills"></div>
+
+          <!-- ── Right: Buyer Summary ── -->
+          <div class="summary-col" id="summary-col">
+
+            <!-- Empty state -->
+            <div class="summary-empty" id="summary-empty">
+              <div class="summary-empty-icon">💬</div>
+              <p>Hit <strong>Summarise Reviews</strong> to get a quick digest — no reading required.</p>
+            </div>
+
+            <!-- Results -->
+            <div id="summary-results" style="display:none;">
+
+              <!-- Verdict -->
+              <div class="verdict-block" id="verdict-block">
+                <div class="verdict-headline" id="verdict-headline">—</div>
+                <div class="verdict-sub" id="verdict-sub">—</div>
+              </div>
+
+              <!-- What people mention -->
+              <div class="topics-label">What people talk about</div>
+              <div id="topic-list"></div>
+
+            </div>
+
+          </div>
         </div>
       </div>
 
@@ -757,17 +856,19 @@ function populateDetail() {
   const reviewsContainer = document.getElementById('reviews-container');
   if (p.reviews && p.reviews.length > 0) {
     reviewsContainer.innerHTML = p.reviews.map(review => 
-      `<div class="review-card">${escHtml(review)}</div>`
+      `<div class="review-card"><div class="review-card-text">${escHtml(review)}</div></div>`
     ).join('');
   } else {
     reviewsContainer.innerHTML = '<div class="no-reviews">No reviews yet. Be the first to review this product!</div>';
   }
 
-  // Reset sentiment analysis
-  document.getElementById('sentiment-results').style.display = 'none';
-  document.getElementById('res-sentiment').textContent = 'Click "Analyse Sentiment" to see AI analysis.';
-  document.getElementById('sentiment-fill').style.width = '0%';
-  document.getElementById('sentiment-pills').innerHTML = '';
+  // Reset summary panel
+  document.getElementById('summary-empty').style.display = 'flex';
+  document.getElementById('summary-empty').innerHTML =
+    `<div class="summary-empty-icon">💬</div>
+     <p>Hit <strong>Summarise Reviews</strong> to get a quick digest — no reading required.</p>`;
+  document.getElementById('summary-results').style.display = 'none';
+  document.getElementById('topic-list').innerHTML = '';
   
   document.getElementById('reco-list').innerHTML =
     '<li class="reco-item" style="color:var(--muted);font-size:0.8rem;border:none;">No results yet.</li>';
@@ -780,65 +881,146 @@ function populateDetail() {
 
 // ── Sentiment ──
 async function runSentiment() {
-  const el    = document.getElementById('res-sentiment');
-  const fill  = document.getElementById('sentiment-fill');
-  const pills = document.getElementById('sentiment-pills');
-  const resultsSection = document.getElementById('sentiment-results');
+  const btn = document.getElementById('analyse-btn');
 
   if (!currentProduct.reviews || currentProduct.reviews.length === 0) {
-    el.textContent = 'No reviews available for this product.';
-    resultsSection.style.display = 'block';
+    toast('No reviews to summarise yet.');
     return;
   }
 
-  resultsSection.style.display = 'block';
-  el.innerHTML = '<span class="spinner"></span>Analysing reviews…';
-  pills.innerHTML = '';
+  // Loading state
+  document.getElementById('summary-empty').style.display = 'flex';
+  document.getElementById('summary-empty').innerHTML =
+    `<div class="summary-empty-icon"><span class="spinner" style="width:16px;height:16px;border-width:2px;margin:0;"></span></div>
+     <p style="margin-top:0.6rem;">Reading all reviews…</p>`;
+  document.getElementById('summary-results').style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Reading…';
 
   try {
     const res  = await fetch(`${API}/sentiment`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        reviews: currentProduct.reviews,
-        product_id: currentProduct.id 
-      }),
+      body: JSON.stringify({ reviews: currentProduct.reviews, product_id: currentProduct.id }),
     });
     const data = await res.json();
+    const s    = data.summary;
+    const lbl  = data.overall_label || 'neutral';
+    const total = s.total_aspects || 1;
 
-    const pct = Math.round(data.score * 100);
-    fill.style.width = pct + '%';
+    // ── Verdict copy (plain English) ──
+    const verdictHeadlines = {
+      positive: [
+        'Customers love this product',
+        'Highly recommended by buyers',
+        'Most people are happy with it'
+      ],
+      neutral: [
+        'Reviews are mixed on this one',
+        'Some love it, some don\'t',
+        'Has its ups and downs'
+      ],
+      negative: [
+        'Customers have real concerns',
+        'Most buyers are disappointed',
+        'Significant issues reported'
+      ]
+    };
+    const verdictSubs = {
+      positive: `${s.positive} out of ${s.total_aspects} mentions across all reviews were positive.`,
+      neutral:  `Opinions are split — worth reading the reviews before buying.`,
+      negative: `${s.negative} out of ${s.total_aspects} mentions raised concerns. Read carefully.`
+    };
+    const headlines = verdictHeadlines[lbl];
+    const headline  = headlines[Math.floor(Math.random() * headlines.length)];
 
-    const labelColors = { positive: '🟢', negative: '🔴', neutral: '🟡' };
-    const labelEmoji = { positive: '😊', negative: '😞', neutral: '😐' };
-    el.innerHTML = `
-      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.95rem;">
-        <span style="font-size:1.5rem;">${labelEmoji[data.label]}</span>
-        <div>
-          <strong>${data.label.charAt(0).toUpperCase() + data.label.slice(1)}</strong> sentiment
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:0.2rem;">
-            ${data.summary.positive} positive · ${data.summary.neutral} neutral · ${data.summary.negative} negative
-          </div>
-        </div>
-      </div>
-    `;
+    // Verdict block
+    const vb = document.getElementById('verdict-block');
+    vb.className = `verdict-block ${lbl}`;
+    document.getElementById('verdict-headline').textContent = headline;
+    document.getElementById('verdict-sub').textContent      = verdictSubs[lbl];
 
-    // Update review cards with sentiment indicators
+    // ── Topic cards ──
+    const topicList = document.getElementById('topic-list');
+    topicList.innerHTML = '';
+
+    const topicVerdict = (info) => {
+      const t = info.positive + info.negative + info.neutral;
+      const dominant = info.positive >= info.negative
+        ? (info.positive >= info.neutral ? 'positive' : 'neutral')
+        : (info.negative >= info.neutral ? 'negative' : 'neutral');
+      const posRatio = t ? info.positive / t : 0;
+      const negRatio = t ? info.negative / t : 0;
+
+      if (dominant === 'positive') {
+        return { sentiment: 'positive', icon: '✓', line: posRatio > 0.8 ? 'Customers love this' : 'Generally praised' };
+      } else if (dominant === 'negative') {
+        return { sentiment: 'negative', icon: '✕', line: negRatio > 0.8 ? 'Frequently criticized' : 'A common concern' };
+      } else {
+        return { sentiment: 'neutral',  icon: '~', line: 'Mixed opinions' };
+      }
+    };
+
+    const asp = data.aspect_summary;
+    if (asp && Object.keys(asp).length > 0) {
+      // Sort by total mentions descending
+      const sorted = Object.entries(asp).sort((a, b) => {
+        const tA = a[1].positive + a[1].negative + a[1].neutral;
+        const tB = b[1].positive + b[1].negative + b[1].neutral;
+        return tB - tA;
+      });
+
+      sorted.forEach(([term, info], i) => {
+        const { sentiment, icon, line } = topicVerdict(info);
+        const card = document.createElement('div');
+        card.className = 'topic-card';
+        card.style.animationDelay = (i * 60) + 'ms';
+        card.innerHTML = `
+          <div class="topic-icon ${sentiment}">${icon}</div>
+          <div>
+            <div class="topic-term">${escHtml(term)}</div>
+            <div class="topic-verdict">${line}</div>
+          </div>`;
+        topicList.appendChild(card);
+      });
+    } else {
+      topicList.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);padding:0.5rem 0;">Nothing specific to highlight.</div>';
+    }
+
+    // Show results
+    document.getElementById('summary-empty').style.display   = 'none';
+    document.getElementById('summary-results').style.display = 'block';
+
+    // ── Annotate review cards with aspect tags ──
     const reviewCards = document.querySelectorAll('.review-card');
-    data.breakdown.forEach((item, idx) => {
-      if (reviewCards[idx]) {
-        reviewCards[idx].classList.add('analyzed');
-        const icon = document.createElement('span');
-        icon.className = 'review-icon';
-        icon.textContent = labelColors[item.label];
-        icon.title = `${item.label} (${Math.round(item.score * 100)}%)`;
-        reviewCards[idx].appendChild(icon);
+    data.reviews.forEach((r, idx) => {
+      const card = reviewCards[idx];
+      if (!card) return;
+
+      // Colour the left border
+      if (r.review_score != null) {
+        const rl = r.review_score > 0.55 ? 'positive' : r.review_score < 0.45 ? 'negative' : 'neutral';
+        card.classList.add('sentiment-' + rl);
+      }
+
+      // Inline aspect tags
+      if (r.aspects && r.aspects.length > 0) {
+        let div = card.querySelector('.review-card-aspects');
+        if (!div) { div = document.createElement('div'); div.className = 'review-card-aspects'; card.appendChild(div); }
+        div.innerHTML = r.aspects.map(a =>
+          `<span class="review-aspect-tag ${a.label}">${escHtml(a.term)}</span>`
+        ).join('');
       }
     });
 
   } catch (e) {
-    el.textContent = 'Error — is the Flask server running?';
+    document.getElementById('summary-empty').innerHTML =
+      `<div class="summary-empty-icon">⚠</div><p style="color:var(--danger);">Couldn't connect to the server.</p>`;
+    document.getElementById('summary-empty').style.display = 'flex';
     toast('API error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Summarise Reviews';
   }
 }
 
@@ -879,12 +1061,16 @@ async function submitReview() {
       // Refresh reviews display
       const reviewsContainer = document.getElementById('reviews-container');
       reviewsContainer.innerHTML = currentProduct.reviews.map(review => 
-        `<div class="review-card">${escHtml(review)}</div>`
+        `<div class="review-card"><div class="review-card-text">${escHtml(review)}</div></div>`
       ).join('');
       
-      // Reset sentiment analysis
-      document.getElementById('sentiment-results').style.display = 'none';
-      document.getElementById('sentiment-fill').style.width = '0%';
+      // Reset summary panel
+      document.getElementById('summary-empty').style.display = 'flex';
+      document.getElementById('summary-empty').innerHTML =
+        `<div class="summary-empty-icon">💬</div>
+         <p>Hit <strong>Summarise Reviews</strong> to get a quick digest — no reading required.</p>`;
+      document.getElementById('summary-results').style.display = 'none';
+      document.getElementById('topic-list').innerHTML = '';
       
       toast('✓ Review posted successfully!');
     } else {
