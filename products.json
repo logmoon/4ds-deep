@@ -1,0 +1,75 @@
+[
+  {
+    "id": "prod_001",
+    "name": "Wireless Noise-Cancelling Headphones",
+    "image_path": "static/images/prod_001.jpg",
+    "price": 129.99,
+    "category": "electronics",
+    "alt_text": "Black wireless over-ear headphones with noise-cancelling technology and cushioned ear pads",
+    "sentiment_score": 0.82,
+    "sentiment_label": "positive",
+    "image_ok": true,
+    "reviews": [
+      "Amazing sound quality, totally worth it!",
+      "Battery life is incredible, love these.",
+      "A bit tight on my ears but sound is great."
+    ]
+  },
+  {
+    "id": "prod_002",
+    "name": "Ergonomic Office Chair",
+    "image_path": "static/images/prod_002.jpg",
+    "price": 249.0,
+    "category": "furniture",
+    "alt_text": "Modern ergonomic office chair with adjustable height, lumbar support, and mesh back in black",
+    "sentiment_score": 0.41,
+    "sentiment_label": "neutral",
+    "image_ok": true,
+    "reviews": [
+      "My back pain disappeared after a week.",
+      "Assembly was a nightmare, instructions are terrible.",
+      "Comfortable but the armrests feel cheap.",
+      "Horrible chair"
+    ]
+  },
+  {
+    "id": "prod_003",
+    "name": "Slim Fit Denim Jacket",
+    "image_path": "static/images/prod_003.jpg",
+    "price": 59.99,
+    "category": "clothing",
+    "alt_text": "Classic blue denim jacket with button closure, chest pockets, and slim fit design",
+    "sentiment_score": 0.67,
+    "sentiment_label": "positive",
+    "image_ok": true,
+    "reviews": [
+      "Great quality for the price!",
+      "Runs small, order a size up.",
+      "Love the fit and the colour."
+    ]
+  },
+  {
+    "category": "sports",
+    "alt_text": "High-quality product photograph with clear details and professional lighting hello",
+    "sentiment_score": null,
+    "sentiment_label": null,
+    "image_ok": true,
+    "reviews": [],
+    "id": "prod_3cab8256",
+    "name": "Test",
+    "price": 32.0,
+    "image_path": "static/images/prod_3cab8256.jpg"
+  },
+  {
+    "category": "books",
+    "alt_text": "High-quality product photograph with clear details and professional lighting",
+    "sentiment_score": null,
+    "sentiment_label": null,
+    "image_ok": true,
+    "reviews": [],
+    "id": "prod_726bd58c",
+    "name": "Book",
+    "price": 399.0,
+    "image_path": "static/images/prod_726bd58c.jpg"
+  }
+]
