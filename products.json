@@ -6,6 +6,7 @@
     "price": 129.99,
     "description": "Premium over-ear headphones with active noise cancellation, 30-hour battery life, and foldable design. Compatible with all Bluetooth devices. Includes carrying case and 3.5mm audio cable.",
     "seller": "AudioTech Store",
+    "seller_id": "",
     "category": "electronics",
     "alt_text": "Black wireless over-ear headphones with noise-cancelling technology and cushioned ear pads",
     "sentiment_score": 0.9949,
@@ -24,6 +25,7 @@
     "price": 249.0,
     "description": "Fully adjustable ergonomic chair with lumbar support, breathable mesh back, and 4D armrests. Supports up to 120kg. Ideal for long work sessions. Available in black and grey.",
     "seller": "HomeOffice Pro",
+    "seller_id": "",
     "category": "furniture",
     "alt_text": "Modern ergonomic office chair with adjustable height, lumbar support, and mesh back in black",
     "sentiment_score": 0.41,
@@ -43,6 +45,7 @@
     "price": 59.99,
     "description": "Classic slim-fit denim jacket in washed blue. Features two chest pockets, button closure, and a comfortable stretch fabric. Machine washable. Available in sizes XS–XXL.",
     "seller": "UrbanThreads",
+    "seller_id": "",
     "category": "clothing",
     "alt_text": "Classic blue denim jacket with button closure, chest pockets, and slim fit design",
     "sentiment_score": 0.67,
@@ -52,6 +55,113 @@
       "Great quality for the price!",
       "Runs small, order a size up.",
       "Love the fit and the colour."
+    ]
+  },
+  {
+    "id": "prod_004",
+    "name": "Pro Wireless Gaming Headset",
+    "image_path": "static/images/gaming_headset.jpg",
+    "price": 89.99,
+    "description": "High-fidelity wireless gaming headset with 7.1 surround sound, detachable noise-cancelling microphone, and 20-hour battery. Compatible with PC, PS5, and Xbox. Memory foam ear cushions for extended sessions.",
+    "seller": "GearZone",
+    "seller_id": "",
+    "category": "electronics",
+    "alt_text": "Black wireless gaming headset with RGB lighting, padded ear cups, and detachable microphone",
+    "sentiment_score": 0.81,
+    "sentiment_label": "positive",
+    "image_ok": true,
+    "reviews": [
+      "Surround sound is insane, totally immersive.",
+      "Mic quality is surprisingly good for the price.",
+      "Comfortable even after 5-hour sessions.",
+      "Wireless range is excellent, no dropouts.",
+      "The RGB is a nice touch but not overdone."
+    ]
+  },
+  {
+    "id": "prod_005",
+    "name": "Razer DeathAdder V3 Gaming Mouse",
+    "image_path": "static/images/razer_mouse.jpg",
+    "price": 69.99,
+    "description": "Ultralight ergonomic gaming mouse with Razer Focus Pro 30K optical sensor, 90-hour battery life, and HyperSpeed wireless technology. 5 programmable buttons. Ideal for FPS and competitive gaming.",
+    "seller": "GearZone",
+    "seller_id": "",
+    "category": "electronics",
+    "alt_text": "Black Razer DeathAdder V3 wireless gaming mouse with ergonomic shape and Razer logo",
+    "sentiment_score": 0.91,
+    "sentiment_label": "positive",
+    "image_ok": true,
+    "reviews": [
+      "Best mouse I've ever used, sensor is flawless.",
+      "The weight is perfect, feels like nothing in your hand.",
+      "Battery lasts forever, I charge it once a week.",
+      "Clicks are crisp and satisfying.",
+      "Worth every cent, massive upgrade from my old mouse."
+    ]
+  },
+  {
+    "id": "prod_006",
+    "name": "Wireless Pro Controller Gamepad",
+    "image_path": "static/images/gamepad.jpg",
+    "price": 54.99,
+    "description": "Ergonomic wireless gamepad compatible with PC, Android, and most consoles. Features dual vibration motors, programmable back buttons, 15-hour battery, and a 2.4GHz dongle for lag-free input. Also works via Bluetooth.",
+    "seller": "GearZone",
+    "seller_id": "",
+    "category": "electronics",
+    "alt_text": "Black wireless gamepad controller with dual analog sticks, triggers, and LED indicator",
+    "sentiment_score": 0.62,
+    "sentiment_label": "positive",
+    "image_ok": true,
+    "reviews": [
+      "Feels great in the hands, solid build quality.",
+      "Works perfectly on PC with no setup needed.",
+      "The back buttons are a game changer for competitive play.",
+      "Vibration could be stronger but it's decent.",
+      "Had connectivity issues at first but a firmware update fixed it."
+    ]
+  },
+  {
+    "id": "prod_007",
+    "name": "Graphics Drawing Tablet",
+    "image_path": "static/images/graphics_tablet.png",
+    "price": 79.99,
+    "description": "Professional graphics tablet with 8192 levels of pen pressure, 10x6 inch active area, and tilt recognition. Includes a battery-free stylus and 8 customisable express keys. Compatible with Photoshop, Illustrator, Clip Studio Paint, and more.",
+    "seller": "CreativeHub",
+    "seller_id": "",
+    "category": "electronics",
+    "alt_text": "Black graphics drawing tablet with stylus pen and express keys on the left side",
+    "sentiment_score": 0.44,
+    "sentiment_label": "neutral",
+    "image_ok": true,
+    "reviews": [
+      "Pen pressure is very responsive, great for illustration.",
+      "Driver installation was a pain on Windows 11.",
+      "Active area is large enough for professional work.",
+      "The express keys are useful once you configure them.",
+      "Pen nibs wear out faster than expected.",
+      "Good value compared to Wacom but build feels cheaper."
+    ]
+  },
+  {
+    "id": "prod_008",
+    "name": "Smart Watch Series X",
+    "image_path": "static/images/smart_watch.webp",
+    "price": 199.99,
+    "description": "Feature-packed smartwatch with AMOLED display, GPS, heart rate and SpO2 monitoring, sleep tracking, and 7-day battery life. Water resistant to 50m. Compatible with iOS and Android. Includes two interchangeable bands.",
+    "seller": "TechWear",
+    "seller_id": "",
+    "category": "electronics",
+    "alt_text": "Black smartwatch with AMOLED display showing fitness stats and a silicone sport band",
+    "sentiment_score": 0.35,
+    "sentiment_label": "negative",
+    "image_ok": true,
+    "reviews": [
+      "Battery life is nowhere near 7 days, more like 3.",
+      "The GPS takes forever to lock on.",
+      "Heart rate monitor is inaccurate during workouts.",
+      "Display looks great though, very sharp.",
+      "App is buggy and crashes frequently.",
+      "Returned it after two weeks, not worth the price."
     ]
   }
 ]
